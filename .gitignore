@@ -1,0 +1,7 @@
+# file
+*.json
+*.safetensors
+*.pth
+
+# custom
+dev-*
