@@ -2,9 +2,10 @@ import torch
 import os
 import modelopt.torch.quantization as mtq
 import modelopt.torch.opt as mto
-from modelopt.torch.quantization.config import FP8_DEFAULT_CFG, NVFP4_DEFAULT_CFG
+from modelopt.torch.quantization.config import INT8_DEFAULT_CFG, FP8_DEFAULT_CFG, NVFP4_DEFAULT_CFG
 from diffusers import AutoPipelineForText2Image
 from src.utils import Calibratior
+from random import randint
 
 
 mto.enable_huggingface_checkpointing()
@@ -12,13 +13,12 @@ mto.enable_huggingface_checkpointing()
 def main():
     # 1. Initialize Calibratior
     # We'll use a small sample size for demonstration
-    calibratior = Calibratior(sample_size=10, seed=42)
+    calibratior = Calibratior(sample_size=128, seed=randint(1, 1000))
     calibratior.get_calibration_prompts()
     
     model_id = "stabilityai/sd-turbo"
     configs = [
-        ("fp8", FP8_DEFAULT_CFG),
-        ("nvfp4", NVFP4_DEFAULT_CFG)
+        ("int8", INT8_DEFAULT_CFG),
     ]
 
     # 3. Quantization Loop
@@ -50,9 +50,13 @@ def main():
         output_dir = f"./quantized_sd_turbo_{fmt_name}"
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-
         save_path = os.path.join(output_dir, "unet")
-        quantized_unet.save_pretrained(save_path)
+        
+        quantized_unet.save_config(save_path)
+        mto.save(quantized_unet, f"{save_path}/modelopt_model.pth")
+        # quantized_unet.save_pretrained(save_path)
+        # mtq.compress(quantized_unet)
+        # mto.save(quantized_unet, f"{save_path}/modelopt_compressed_model.pth")
         
         print(f"✅ {fmt_name.upper()} Quantization complete! Model saved to: {save_path}")
 
