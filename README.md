@@ -13,7 +13,7 @@ To do modelopt qunatization. Playing with [Nine Lives](https://www.youtube.com/w
 
 * **Setup**
 
-  * Recommend to run at Linux.
+  * Recommend to run at Linux. On Windows, can try WSL.
 
     ```sh
     uv venv --python 3.13

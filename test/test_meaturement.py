@@ -3,15 +3,17 @@ import torch
 from diffusers import AutoPipelineForText2Image, UNet2DConditionModel
 import modelopt.torch.opt as mto
 import modelopt.torch.quantization as mtq
+import dotenv
 
 
+dotenv.load_dotenv()
 mto.enable_huggingface_checkpointing()
 
 def get_model_mem_size(model):
     return sum(p.element_size() * p.nelement() for p in model.parameters())
 
 
-model_id = "stabilityai/sd-turbo"
+model_id = os.getenv("MODEL_ID", "stabilityai/sd-turbo")
 # load original and quantized UNet
 original_unet = UNet2DConditionModel.from_pretrained(
     model_id,
@@ -56,7 +58,7 @@ output_filename = f"test_image_fp16.png"
 image_fp16.save(output_filename)
 print(f"✅ Test image saved to {output_filename}")
 
-print("Pipeline already, using INT8 UNet. Running test inference...")    
+print("Pipeline already, using INT8 UNet. Running test inference...")
 image_int8 = pipe_int8(
     "a photo of an astronaut riding a horse on mars",
     num_inference_steps=2, guidance_scale=0.0,
