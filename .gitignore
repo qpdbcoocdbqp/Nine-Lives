@@ -1,0 +1,11 @@
+# cache
+.env
+*.pyc
+
+# file
+*.json
+*.safetensors
+*.pth
+
+# custom
+dev-*
