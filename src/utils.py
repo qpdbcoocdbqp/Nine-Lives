@@ -5,6 +5,7 @@ from datasets import load_dataset
 from diffusers import AutoPipelineForText2Image
 import modelopt.torch.quantization as mtq
 from modelopt.torch.quantization.config import FP8_DEFAULT_CFG, NVFP4_DEFAULT_CFG
+from tqdm import tqdm
 
 
 class Calibratior:
@@ -12,7 +13,7 @@ class Calibratior:
     A utility class for managing calibration datasets and performing the calibration loop 
     required for diffusion model quantization.
     """
-    def __init__(self, sample_size=128, seed=42, pipe=None):
+    def __init__(self, sample_size=128, seed=42, pipe=None, tokenizer=None):
         """
         Initialize the Calibratior.
 
@@ -24,6 +25,7 @@ class Calibratior:
         self.sample_size = sample_size
         self.seed = seed
         self.pipe = pipe
+        self.tokenizer = tokenizer
         self.prompts = []
 
     def set_pipeline(self, pipe):
@@ -124,10 +126,7 @@ class Calibratior:
 
         print(f"Starting calibration inference on {len(self.prompts)} prompts...")
         
-        for i, prompt in enumerate(self.prompts):
-            if i % 10 == 0:
-                print(f"Progress: {i}/{len(self.prompts)}")
-            
+        for prompt in tqdm(self.prompts):
             # Truncate prompt using the executor's tokenizer
             if hasattr(inference_executor, "tokenizer"):
                 tokens = inference_executor.tokenizer.encode(prompt, add_special_tokens=False)
@@ -141,6 +140,15 @@ class Calibratior:
             inference_executor(prompt, num_inference_steps=1, guidance_scale=0.0)
         
         print("Calibration inference completed successfully.")
+
+    def calibration_with_tokenizer(self, model=None):
+        """Text-based calibration loop for LLMs."""
+        for prompt in tqdm(self.prompts):
+            inputs = self.tokenizer(prompt, return_tensors="pt").to(model.device)
+            model(**inputs)
+
+def get_model_mem_size(model):
+    return sum(p.element_size() * p.nelement() for p in model.parameters())
 
 if __name__ == "__main__":
     # Example: How to fetch and save calibration prompts

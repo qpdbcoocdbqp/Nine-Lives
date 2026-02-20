@@ -1,17 +1,14 @@
+import dotenv
+import modelopt.torch.opt as mto
+import modelopt.torch.quantization as mtq
 import os
 import torch
 from diffusers import AutoPipelineForText2Image, UNet2DConditionModel
-import modelopt.torch.opt as mto
-import modelopt.torch.quantization as mtq
-import dotenv
+from src.utils import get_model_mem_size
 
 
 dotenv.load_dotenv()
 mto.enable_huggingface_checkpointing()
-
-def get_model_mem_size(model):
-    return sum(p.element_size() * p.nelement() for p in model.parameters())
-
 
 model_id = os.getenv("MODEL_ID", "stabilityai/sd-turbo")
 # load original and quantized UNet

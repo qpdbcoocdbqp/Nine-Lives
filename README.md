@@ -39,7 +39,8 @@ To do modelopt qunatization. Playing with [Nine Lives](https://www.youtube.com/w
 * **Example**
 
   * `stabilityai/sd-turbo`: `unet` quantization. Because ModelOpt only support `INT8` quantization for `CNN` network. So only `INT8_DEFAULT_CFG` configuration can be used.
-  
+  * `google/gemma-3-270m-it-qat-q4_0-unquantized` : quantization with `INT4_BLOCKWISE_WEIGHT_ONLY_CFG`. `NVFP4` series seems not work on Windows.
+
 * Simple quantize workflow
 
   * `test_calibratior` show

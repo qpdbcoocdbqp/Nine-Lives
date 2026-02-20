@@ -6,6 +6,7 @@
 *.json
 *.safetensors
 *.pth
+*.jinja
 
 # custom
 dev-*
