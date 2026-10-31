@@ -1,16 +1,10 @@
-from typing import Any
-import sys
-sys.path.append("docs/source/SPOT-dLLM/")
-import time
 import torch
-# pyrefly: ignore[missing-import]
-from spot.decode import DecodeConfig, generate
-# pyrefly: ignore[missing-import]
-from spot.drafters import SlotDrafter
-# pyrefly: ignore[missing-import]
-from spot.models import load_adapter
-# pyrefly: ignore[missing-import]
-from spot.tasks import load_task, score_task
+from typing import Any
+
+from src.spot.decode import DecodeConfig, generate
+from src.spot.drafters import SlotDrafter
+from src.spot.models import load_adapter
+from src.spot.tasks import load_task, score_task
 
 
 device = "cuda"
